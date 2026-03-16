@@ -1,0 +1,1684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Piano in the Sky — Photo Card Box</title>
+<link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Caveat:wght@400;700&family=Permanent+Marker&family=Righteous&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --taupe: #b8a090;
+  --cream: #f5ede0;
+  --sky: #7ab8d4;
+  --sky-light: #c8e0f0;
+  --yellow: #e8c830;
+  --pink: #e86b8a;
+  --soft-pink: #f5c8d8;
+  --green: #7aab6a;
+  --brown: #6a5040;
+  --black: #1a1510;
+  --orange: #e07840;
+}
+
+body {
+  background: #eee8de;
+  font-family: 'Caveat', cursive;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* paper texture */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── header ── */
+.header {
+  text-align: center;
+  padding: 36px 20px 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.header-title {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 42px;
+  color: var(--black);
+  line-height: 1.1;
+  display: inline-block;
+  position: relative;
+}
+
+.header-title::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: var(--yellow);
+  z-index: -1;
+  transform: rotate(-0.5deg);
+}
+
+.header-sub {
+  font-family: 'Caveat', cursive;
+  font-size: 18px;
+  color: var(--brown);
+  margin-top: 8px;
+  font-style: italic;
+}
+
+.header-tags {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.htag {
+  font-family: 'Caveat', cursive;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 5px 14px;
+  border-radius: 20px;
+  letter-spacing: 0.05em;
+}
+.htag-blue { background: var(--sky); color: white; transform: rotate(-1deg); }
+.htag-pink { background: var(--pink); color: white; transform: rotate(1.5deg); }
+.htag-yellow { background: var(--yellow); color: var(--black); transform: rotate(-0.5deg); }
+
+/* ── view toggle ── */
+.toggle-wrap {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  padding: 16px 0 24px;
+  position: relative;
+  z-index: 1;
+}
+.tvbtn {
+  font-family: 'Caveat', cursive;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 8px 20px;
+  border: 2px solid var(--black);
+  background: white;
+  color: var(--black);
+  cursor: pointer;
+  border-radius: 3px;
+  transition: all 0.18s;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.tvbtn:hover { background: var(--yellow); }
+.tvbtn.active { background: var(--black); color: var(--yellow); }
+
+/* ── views ── */
+.view { display: none; position: relative; z-index: 1; padding: 0 20px 80px; }
+.view.active { display: block; }
+
+/* ════════════════════════════
+   VIEW 1 — BOX + CONTENTS SPREAD
+════════════════════════════ */
+
+.spread-layout {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+/* ── OUTER BOX ── */
+.box-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.box-label {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--brown);
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.photo-box-3d {
+  width: 280px;
+  height: 300px;
+  position: relative;
+  perspective: 900px;
+}
+
+.box-body {
+  width: 220px;
+  height: 260px;
+  position: absolute;
+  top: 20px;
+  left: 30px;
+  transform-style: preserve-3d;
+  transform: rotateX(-10deg) rotateY(-20deg);
+  filter: drop-shadow(0 24px 48px rgba(0,0,0,0.3));
+}
+
+.bface {
+  position: absolute;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.12);
+}
+
+/* Front */
+.bface-front {
+  width: 220px; height: 260px;
+  transform: translateZ(40px);
+  background: var(--taupe);
+}
+
+/* Right side */
+.bface-right {
+  width: 80px; height: 260px;
+  right: -40px; top: 0;
+  transform: rotateY(90deg) translateZ(0px);
+  transform-origin: left center;
+  background: #9a8070;
+}
+
+/* Top */
+.bface-top {
+  width: 220px; height: 80px;
+  top: -40px; left: 0;
+  transform: rotateX(90deg) translateZ(0px);
+  transform-origin: bottom center;
+  background: #ccc0b0;
+}
+
+/* texture on all faces */
+.bface::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+/* front face content */
+.box-front-content {
+  position: absolute;
+  inset: 0;
+  padding: 16px 14px 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+.box-front-topband {
+  background: var(--sky);
+  margin: -16px -14px 12px;
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bft-left {
+  font-family: 'Righteous', sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  color: white;
+  text-transform: uppercase;
+}
+
+.bft-right {
+  font-family: 'Caveat', cursive;
+  font-size: 11px;
+  color: rgba(255,255,255,0.7);
+}
+
+/* Piano ransom letters on box */
+.box-piano-letters {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 8px;
+}
+
+.bl { font-weight: 900; display: inline-block; padding: 1px 4px; line-height: 1; font-size: 20px; }
+.bl-P { font-family: 'Abril Fatface', serif; background: var(--sky); color: white; transform: rotate(-2deg); }
+.bl-I { font-family: 'Unbounded', sans-serif; background: var(--yellow); color: var(--black); transform: rotate(2deg); font-size: 14px; }
+.bl-A { font-family: 'Permanent Marker', cursive; background: var(--pink); color: white; transform: rotate(-1deg); }
+.bl-N { font-family: 'Abril Fatface', serif; background: var(--cream); color: var(--brown); transform: rotate(1deg); border: 1.5px solid var(--brown); }
+.bl-O { font-family: 'Righteous', sans-serif; background: var(--green); color: white; transform: rotate(-2deg); }
+
+/* photo booth strip preview on box front */
+.box-strip-preview {
+  flex: 1;
+  display: flex;
+  gap: 6px;
+  padding: 4px 0;
+}
+
+.strip-preview-card {
+  flex: 1;
+  background: white;
+  border-radius: 2px;
+  overflow: hidden;
+  box-shadow: 1px 2px 4px rgba(0,0,0,0.2);
+  position: relative;
+}
+
+.strip-preview-img {
+  width: 100%;
+  aspect-ratio: 3/4;
+}
+
+.box-bottom-strip {
+  background: var(--black);
+  margin: 8px -14px -14px;
+  padding: 6px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bbs-title {
+  font-family: 'Caveat', cursive;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--yellow);
+}
+.bbs-count {
+  font-family: 'Caveat', cursive;
+  font-size: 10px;
+  color: rgba(255,255,255,0.5);
+}
+
+/* top face content */
+.box-top-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+}
+
+.top-keys {
+  display: flex;
+  gap: 1px;
+  height: 100%;
+  align-items: flex-end;
+}
+.tk-w { flex: 1; height: 90%; background: rgba(255,255,255,0.55); border-radius: 0 0 2px 2px; }
+.tk-b { width: 6px; height: 60%; background: rgba(30,20,15,0.5); border-radius: 0 0 2px 2px; margin: 0 -3px; z-index: 1; }
+
+/* right side content */
+.box-right-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 6px;
+}
+
+.right-spine-text {
+  writing-mode: vertical-rl;
+  font-family: 'Caveat', cursive;
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.15em;
+  transform: rotate(180deg);
+}
+
+/* box lid band */
+.box-lid-band {
+  position: absolute;
+  left: 50%;
+  top: -40px;
+  bottom: 0;
+  width: 20px;
+  transform: translateX(-50%);
+  background: rgba(232,200,48,0.7);
+  z-index: 10;
+}
+
+/* ── CONTENTS COLUMN ── */
+.contents-column {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.contents-header {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 22px;
+  color: var(--black);
+  padding-bottom: 8px;
+  border-bottom: 2px dashed rgba(106,80,64,0.25);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.contents-header span {
+  background: var(--yellow);
+  font-family: 'Caveat', cursive;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 2px 10px;
+  color: var(--black);
+  transform: rotate(-1deg);
+  display: inline-block;
+}
+
+/* ── item rows ── */
+.item-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.item-section-title {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: var(--brown);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.item-section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(106,80,64,0.2);
+}
+
+.item-row {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+/* ── PHOTO BOOTH STRIP ── */
+.photo-strip {
+  background: white;
+  padding: 8px 8px 20px;
+  box-shadow: 2px 4px 12px rgba(0,0,0,0.18);
+  width: 96px;
+  position: relative;
+  transform: rotate(var(--rot, -2deg));
+  flex-shrink: 0;
+  transition: transform 0.2s;
+  cursor: pointer;
+}
+.photo-strip:hover { transform: rotate(0deg) scale(1.04); }
+
+.strip-frame {
+  width: 80px;
+  aspect-ratio: 3/4;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 3px;
+}
+
+.strip-shot {
+  width: 80px;
+  aspect-ratio: 1/1;
+  overflow: hidden;
+  position: relative;
+  border-bottom: 1px solid #eee;
+}
+
+.strip-label-bottom {
+  position: absolute;
+  bottom: 3px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: 'Caveat', cursive;
+  font-size: 8px;
+  color: #aaa;
+}
+
+/* ── PHOTO CARDS (square/portrait) ── */
+.photo-card {
+  background: white;
+  padding: 6px 6px 20px;
+  box-shadow: 2px 4px 10px rgba(0,0,0,0.15);
+  width: 88px;
+  position: relative;
+  transform: rotate(var(--rot, 0deg));
+  flex-shrink: 0;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+.photo-card:hover { 
+  transform: rotate(0deg) translateY(-6px) scale(1.06); 
+  box-shadow: 4px 10px 24px rgba(0,0,0,0.22);
+  z-index: 10;
+}
+
+.pc-img {
+  width: 76px;
+  aspect-ratio: 2/3;
+  overflow: hidden;
+  position: relative;
+}
+
+.pc-caption {
+  font-family: 'Caveat', cursive;
+  font-size: 8px;
+  color: #aaa;
+  text-align: center;
+  margin-top: 4px;
+}
+
+/* ── STICKER SHEET ── */
+.sticker-sheet {
+  background: white;
+  border: 1px dashed rgba(0,0,0,0.15);
+  padding: 10px;
+  width: 160px;
+  box-shadow: 1px 2px 8px rgba(0,0,0,0.1);
+  transform: rotate(1deg);
+  flex-shrink: 0;
+  transition: transform 0.2s;
+  cursor: pointer;
+  position: relative;
+}
+.sticker-sheet:hover { transform: rotate(0deg) scale(1.04); }
+
+.ss-title {
+  font-family: 'Caveat', cursive;
+  font-size: 10px;
+  color: var(--brown);
+  text-align: center;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+.ss-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+
+.sticker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  position: relative;
+}
+
+/* ── MINI BOOKLET ── */
+.mini-booklet {
+  background: var(--cream);
+  border: 1.5px solid rgba(106,80,64,0.2);
+  width: 120px;
+  box-shadow: 2px 3px 10px rgba(0,0,0,0.12);
+  transform: rotate(-1.5deg);
+  flex-shrink: 0;
+  transition: transform 0.2s;
+  cursor: pointer;
+  overflow: hidden;
+}
+.mini-booklet:hover { transform: rotate(0deg) scale(1.04); }
+
+.mb-cover {
+  background: var(--taupe);
+  padding: 12px 10px 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.mb-cover-title {
+  font-family: 'Abril Fatface', serif;
+  font-size: 14px;
+  color: white;
+  line-height: 1.2;
+  position: relative;
+  z-index: 1;
+}
+
+.mb-cover-sub {
+  font-family: 'Caveat', cursive;
+  font-size: 10px;
+  color: rgba(255,255,255,0.6);
+  margin-top: 2px;
+  position: relative;
+  z-index: 1;
+}
+
+.mb-body {
+  padding: 8px 10px;
+}
+
+.mb-line {
+  font-family: 'Caveat', cursive;
+  font-size: 9px;
+  color: var(--brown);
+  padding: 3px 0;
+  border-bottom: 0.5px solid rgba(106,80,64,0.1);
+  display: block;
+}
+
+/* ── ENVELOPE / BACKING CARD ── */
+.backing-card {
+  background: var(--sky-light);
+  border: 1.5px solid rgba(122,184,212,0.4);
+  width: 100px;
+  padding: 12px 10px;
+  box-shadow: 1px 2px 8px rgba(0,0,0,0.1);
+  transform: rotate(2deg);
+  flex-shrink: 0;
+  transition: transform 0.2s;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.backing-card:hover { transform: rotate(0deg) scale(1.04); }
+
+.bc-title {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 12px;
+  color: var(--sky);
+  margin-bottom: 6px;
+  display: block;
+}
+
+.bc-body {
+  font-family: 'Caveat', cursive;
+  font-size: 9px;
+  color: var(--brown);
+  line-height: 1.6;
+}
+
+/* ── MYSTERY CARD ── */
+.mystery-card {
+  background: var(--black);
+  width: 88px;
+  padding: 14px 10px;
+  box-shadow: 3px 5px 16px rgba(0,0,0,0.35);
+  transform: rotate(-3deg);
+  flex-shrink: 0;
+  transition: transform 0.2s;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.mystery-card:hover { transform: rotate(0deg) translateY(-4px) scale(1.06); }
+
+.mc-q {
+  font-family: 'Abril Fatface', serif;
+  font-size: 48px;
+  color: rgba(232,200,48,0.2);
+  text-align: center;
+  line-height: 1;
+}
+
+.mc-label {
+  font-family: 'Caveat', cursive;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--yellow);
+  text-align: center;
+  margin-top: 4px;
+}
+
+.mc-sub {
+  font-family: 'Caveat', cursive;
+  font-size: 8px;
+  color: rgba(255,255,255,0.3);
+  text-align: center;
+  margin-top: 2px;
+}
+
+/* item count badges */
+.qty-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-family: 'Caveat', cursive;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-left: 6px;
+}
+
+/* info footer for each item */
+.item-info {
+  font-family: 'Caveat', cursive;
+  font-size: 12px;
+  color: var(--brown);
+  line-height: 1.5;
+  padding: 6px 0;
+}
+
+.item-info strong {
+  font-weight: 700;
+  color: var(--black);
+  display: block;
+}
+
+/* ════════════════════
+   VIEW 2 — PHOTO BOOTH STRIP CLOSEUP
+════════════════════ */
+
+.booth-layout {
+  max-width: 900px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 48px;
+  align-items: start;
+}
+
+.booth-strip-full {
+  background: white;
+  padding: 10px 10px 28px;
+  box-shadow: 4px 8px 24px rgba(0,0,0,0.2);
+  width: 200px;
+  flex-shrink: 0;
+}
+
+.bsf-topbar {
+  background: var(--sky);
+  margin: -10px -10px 8px;
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.bsf-tb-title {
+  font-family: 'Righteous', sans-serif;
+  font-size: 10px;
+  color: white;
+  letter-spacing: 0.08em;
+}
+.bsf-tb-date {
+  font-family: 'Caveat', cursive;
+  font-size: 10px;
+  color: rgba(255,255,255,0.7);
+}
+
+.booth-shot {
+  width: 180px;
+  aspect-ratio: 4/3;
+  margin-bottom: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.bsf-bottom {
+  margin-top: 8px;
+  text-align: center;
+}
+.bsf-brand {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 14px;
+  color: var(--taupe);
+  display: block;
+}
+.bsf-date-text {
+  font-family: 'Caveat', cursive;
+  font-size: 10px;
+  color: #aaa;
+}
+
+.booth-info-col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-top: 8px;
+}
+
+.booth-info-title {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 28px;
+  color: var(--black);
+}
+
+.booth-info-sub {
+  font-family: 'Caveat', cursive;
+  font-size: 16px;
+  color: var(--brown);
+  font-style: italic;
+  margin-top: -12px;
+}
+
+.pose-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.pose-card {
+  background: white;
+  border-radius: 4px;
+  padding: 10px 8px;
+  box-shadow: 1px 2px 8px rgba(0,0,0,0.1);
+  border-top: 3px solid var(--sky);
+  position: relative;
+}
+
+.pose-card.pink-top { border-top-color: var(--pink); }
+.pose-card.yellow-top { border-top-color: var(--yellow); }
+.pose-card.green-top { border-top-color: var(--green); }
+
+.pose-num {
+  font-family: 'Abril Fatface', serif;
+  font-size: 28px;
+  color: rgba(0,0,0,0.08);
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  line-height: 1;
+}
+
+.pose-title {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 13px;
+  color: var(--black);
+  margin-bottom: 4px;
+}
+
+.pose-desc {
+  font-family: 'Caveat', cursive;
+  font-size: 12px;
+  color: var(--brown);
+  line-height: 1.5;
+}
+
+.event-details {
+  background: var(--black);
+  padding: 16px 20px;
+  border-radius: 3px;
+}
+
+.ed-title {
+  font-family: 'Caveat', cursive;
+  font-size: 11px;
+  color: var(--yellow);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.ed-row {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  padding: 5px 0;
+  border-bottom: 0.5px solid rgba(255,255,255,0.08);
+}
+
+.ed-label {
+  font-family: 'Caveat', cursive;
+  font-size: 11px;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  width: 80px;
+  flex-shrink: 0;
+}
+
+.ed-val {
+  font-family: 'Caveat', cursive;
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.8);
+}
+
+/* doodle elements */
+.doodle {
+  position: absolute;
+  font-family: sans-serif;
+  pointer-events: none;
+}
+
+/* ════════════════════
+   VIEW 3 — ALL PHOTO CARDS SPREAD
+════════════════════ */
+
+.cards-spread {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.cards-spread-title {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 24px;
+  color: var(--black);
+  margin-bottom: 6px;
+}
+.cards-spread-sub {
+  font-family: 'Caveat', cursive;
+  font-size: 15px;
+  color: var(--brown);
+  margin-bottom: 28px;
+  font-style: italic;
+}
+
+.card-set {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.card-set-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.csr-label {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: var(--brown);
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.cards-fan {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+/* Individual photo card designs */
+.pc-design {
+  width: 100px;
+  background: white;
+  padding: 7px 7px 22px;
+  box-shadow: 2px 4px 12px rgba(0,0,0,0.15);
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.2s;
+  flex-shrink: 0;
+}
+
+.pc-design:hover {
+  transform: translateY(-12px) rotate(0deg) scale(1.08) !important;
+  box-shadow: 6px 16px 32px rgba(0,0,0,0.25);
+  z-index: 20;
+}
+
+.pc-img-area {
+  width: 86px;
+  aspect-ratio: 2/3;
+  overflow: hidden;
+  position: relative;
+}
+
+.pc-name {
+  font-family: 'Caveat', cursive;
+  font-size: 9px;
+  color: #aaa;
+  text-align: center;
+  margin-top: 5px;
+}
+
+/* tape accent */
+.tape-h {
+  position: absolute;
+  height: 12px;
+  border-radius: 1px;
+  opacity: 0.65;
+}
+
+/* stamp mark */
+.stamp {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Caveat', cursive;
+  font-size: 7px;
+  font-weight: 700;
+  text-align: center;
+  transform: rotate(-15deg);
+  opacity: 0.6;
+}
+
+/* wavy doodle SVG */
+.wavy-doodle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 0;
+}
+</style>
+</head>
+<body>
+
+<!-- wavy doodles like reference -->
+<svg class="wavy-doodle" style="top:80px;left:20px;width:80px;" viewBox="0 0 80 60">
+  <path d="M10 50 Q20 10 30 30 Q40 50 50 20 Q60 5 70 25" stroke="#7aab6a" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <circle cx="10" cy="50" r="5" fill="none" stroke="#7aab6a" stroke-width="3"/>
+  <circle cx="70" cy="25" r="4" fill="none" stroke="#7aab6a" stroke-width="3"/>
+</svg>
+
+<svg class="wavy-doodle" style="bottom:120px;right:30px;width:100px;" viewBox="0 0 100 40">
+  <path d="M5 20 Q15 5 25 20 Q35 35 45 20 Q55 5 65 20 Q75 35 85 20 Q92 10 98 18" stroke="#e07840" stroke-width="4" fill="none" stroke-linecap="round"/>
+</svg>
+
+<svg class="wavy-doodle" style="top:200px;right:40px;width:50px;" viewBox="0 0 50 50">
+  <path d="M25 5 Q40 15 45 25 Q40 40 25 45 Q10 40 5 25 Q10 10 25 5" stroke="#7ab8d4" stroke-width="3" fill="none"/>
+  <circle cx="25" cy="25" r="8" fill="none" stroke="#7ab8d4" stroke-width="2.5"/>
+</svg>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-title">Photo Card Box Set</div>
+  <div class="header-sub">Piano in the Sky · Interactive Event Edition · 2026</div>
+  <div class="header-tags">
+    <span class="htag htag-blue">Polaroid Station</span>
+    <span class="htag htag-pink">Photo Booth Style</span>
+    <span class="htag htag-yellow">Fan Interactive</span>
+  </div>
+</div>
+
+<!-- TOGGLE -->
+<div class="toggle-wrap">
+  <button class="tvbtn active" onclick="sv('box',this)">📦 Box + Contents</button>
+  <button class="tvbtn" onclick="sv('booth',this)">📸 Photo Booth Strip</button>
+  <button class="tvbtn" onclick="sv('cards',this)">🃏 All Photo Cards</button>
+</div>
+
+<!-- ════ VIEW 1: BOX + CONTENTS ════ -->
+<div id="view-box" class="view active">
+  <div class="spread-layout">
+
+    <!-- LEFT: box -->
+    <div class="box-column">
+      <div class="box-label">Outer Packaging Box</div>
+
+      <div class="photo-box-3d">
+        <div class="box-body">
+
+          <!-- TOP FACE -->
+          <div class="bface bface-top">
+            <div class="box-top-content">
+              <div class="top-keys">
+                <div class="tk-w"></div><div class="tk-b"></div>
+                <div class="tk-w"></div><div class="tk-b"></div>
+                <div class="tk-w"></div>
+                <div class="tk-w"></div><div class="tk-b"></div>
+                <div class="tk-w"></div><div class="tk-b"></div>
+                <div class="tk-w"></div><div class="tk-b"></div>
+                <div class="tk-w"></div>
+                <div class="tk-w"></div><div class="tk-b"></div>
+                <div class="tk-w"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT SIDE FACE -->
+          <div class="bface bface-right">
+            <div class="box-right-content">
+              <div class="right-spine-text">Piano in the Sky · A.L. · 2026</div>
+            </div>
+          </div>
+
+          <!-- FRONT FACE -->
+          <div class="bface bface-front">
+            <div class="box-front-content">
+              <!-- top band -->
+              <div class="box-front-topband">
+                <span class="bft-left">Photo Card Box</span>
+                <span class="bft-right">Limited · 2026</span>
+              </div>
+
+              <!-- PIANO cut letters -->
+              <div class="box-piano-letters">
+                <span class="bl bl-P">P</span>
+                <span class="bl bl-I">I</span>
+                <span class="bl bl-A">A</span>
+                <span class="bl bl-N">N</span>
+                <span class="bl bl-O">O</span>
+              </div>
+
+              <!-- in the SKY -->
+              <div style="display:flex;gap:4px;align-items:center;margin-bottom:8px;">
+                <div style="background:#1a1510;color:#e8c830;font-family:'Caveat',cursive;font-size:10px;font-weight:700;padding:2px 6px;transform:rotate(-1deg);">in the</div>
+                <div style="background:#7ab8d4;color:white;font-family:'Abril Fatface',serif;font-size:12px;padding:1px 6px;transform:rotate(1deg);">SKY</div>
+              </div>
+
+              <!-- preview strip cards -->
+              <div class="box-strip-preview">
+                <!-- card 1 -->
+                <div class="strip-preview-card">
+                  <svg class="strip-preview-img" viewBox="0 0 40 54" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="40" height="54" fill="#c8e0f0"/>
+                    <ellipse cx="20" cy="16" rx="10" ry="12" fill="#e8d0b8"/>
+                    <rect x="5" y="30" width="30" height="24" rx="0" fill="#b8a0d8"/>
+                    <text x="11" y="22" font-size="10" fill="#7ab8d4" font-family="serif">♥</text>
+                  </svg>
+                </div>
+                <!-- card 2 -->
+                <div class="strip-preview-card">
+                  <svg class="strip-preview-img" viewBox="0 0 40 54" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="40" height="54" fill="#f5e8d0"/>
+                    <ellipse cx="20" cy="16" rx="10" ry="12" fill="#e8d0b8"/>
+                    <rect x="5" y="30" width="30" height="24" rx="0" fill="#e86b8a"/>
+                    <text x="12" y="20" font-size="10" fill="#e86b8a" font-family="serif">★</text>
+                  </svg>
+                </div>
+                <!-- card 3 -->
+                <div class="strip-preview-card">
+                  <svg class="strip-preview-img" viewBox="0 0 40 54" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="40" height="54" fill="#1a1510"/>
+                    <ellipse cx="20" cy="16" rx="10" ry="12" fill="#d8c8a8"/>
+                    <rect x="5" y="30" width="30" height="24" rx="0" fill="#2a2018"/>
+                    <text x="12" y="50" font-size="8" fill="#e8c830" font-family="'Caveat',cursive" font-weight="bold">2026</text>
+                  </svg>
+                </div>
+              </div>
+
+              <!-- bottom strip -->
+              <div class="box-bottom-strip">
+                <span class="bbs-title">a.l. · Piano in the Sky</span>
+                <span class="bbs-count">8 items inside</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- lid yellow band -->
+          <div class="box-lid-band"></div>
+        </div>
+      </div>
+
+      <!-- box shadow text -->
+      <div style="text-align:center;">
+        <div style="font-family:'Caveat',cursive;font-size:13px;color:var(--brown);font-style:italic;">Approx. 10cm × 14cm × 3cm</div>
+        <div style="font-family:'Caveat',cursive;font-size:12px;color:rgba(106,80,64,0.5);margin-top:2px;">Cut-paper collage design · Limited edition</div>
+      </div>
+    </div>
+
+    <!-- RIGHT: contents spread -->
+    <div class="contents-column">
+      <div class="contents-header">
+        What's Inside <span>8 items</span>
+      </div>
+
+      <!-- PHOTO BOOTH STRIPS -->
+      <div class="item-section">
+        <div class="item-section-title">
+          Photo Booth Strips
+          <span class="qty-badge" style="background:#7ab8d4;color:white;">×2</span>
+        </div>
+        <div class="item-row">
+          <!-- strip 1 -->
+          <div class="photo-strip" style="--rot:-3deg;">
+            <div style="background:#7ab8d4;margin:-8px -8px 4px;padding:4px 8px;">
+              <span style="font-family:'Righteous',sans-serif;font-size:7px;color:white;letter-spacing:0.1em;">PIANO IN THE SKY</span>
+            </div>
+            <div class="strip-shot" style="margin-bottom:2px;">
+              <svg viewBox="0 0 80 60" width="80" height="60">
+                <rect width="80" height="60" fill="#c8e0f0"/>
+                <ellipse cx="40" cy="28" rx="16" ry="18" fill="#e8d0b8"/>
+                <rect x="14" y="44" width="52" height="16" fill="#7ab8d4"/>
+                <text x="30" y="15" font-size="12" fill="#7ab8d4" font-family="serif">☁</text>
+              </svg>
+            </div>
+            <div class="strip-shot" style="margin-bottom:2px;">
+              <svg viewBox="0 0 80 60" width="80" height="60">
+                <rect width="80" height="60" fill="#b8a090"/>
+                <ellipse cx="40" cy="28" rx="16" ry="18" fill="#e8d0b8"/>
+                <rect x="14" y="44" width="52" height="16" fill="#8a7060"/>
+                <text x="25" y="56" font-size="8" fill="rgba(255,255,255,0.5)" font-family="'Caveat',cursive">✦ ✦ ✦</text>
+              </svg>
+            </div>
+            <div class="strip-shot">
+              <svg viewBox="0 0 80 60" width="80" height="60">
+                <rect width="80" height="60" fill="#1a1510"/>
+                <ellipse cx="40" cy="28" rx="16" ry="18" fill="#d8c8a8"/>
+                <rect x="14" y="44" width="52" height="16" fill="#2a2018"/>
+                <text x="26" y="56" font-size="9" fill="#e8c830" font-family="'Caveat',cursive" font-weight="bold">Piano ♪</text>
+              </svg>
+            </div>
+            <div class="strip-label-bottom">a.l. · 2026</div>
+          </div>
+
+          <!-- strip 2 (different version) -->
+          <div class="photo-strip" style="--rot:2deg;">
+            <div style="background:#e86b8a;margin:-8px -8px 4px;padding:4px 8px;">
+              <span style="font-family:'Righteous',sans-serif;font-size:7px;color:white;letter-spacing:0.1em;">SKY VERSION</span>
+            </div>
+            <div class="strip-shot" style="margin-bottom:2px;">
+              <svg viewBox="0 0 80 60" width="80" height="60">
+                <rect width="80" height="60" fill="#f5e8d0"/>
+                <ellipse cx="40" cy="28" rx="16" ry="18" fill="#e8d0b8"/>
+                <rect x="14" y="44" width="52" height="16" fill="#e86b8a"/>
+                <text x="26" y="15" font-size="11" fill="#e86b8a" font-family="serif">♥</text>
+              </svg>
+            </div>
+            <div class="strip-shot" style="margin-bottom:2px;">
+              <svg viewBox="0 0 80 60" width="80" height="60">
+                <rect width="80" height="60" fill="#7aab6a"/>
+                <ellipse cx="40" cy="28" rx="16" ry="18" fill="#e8d0b8"/>
+                <rect x="14" y="44" width="52" height="16" fill="#5a8a4a"/>
+                <text x="26" y="56" font-size="9" fill="#e8c830" font-family="'Caveat',cursive">★ ★ ★</text>
+              </svg>
+            </div>
+            <div class="strip-shot">
+              <svg viewBox="0 0 80 60" width="80" height="60">
+                <rect width="80" height="60" fill="#e8c830"/>
+                <ellipse cx="40" cy="28" rx="16" ry="18" fill="#e8d0b8"/>
+                <rect x="14" y="44" width="52" height="16" fill="#c8a818"/>
+                <text x="22" y="56" font-size="9" fill="#1a1510" font-family="'Caveat',cursive" font-weight="bold">in the sky ♪</text>
+              </svg>
+            </div>
+            <div class="strip-label-bottom">fan edition · 2026</div>
+          </div>
+
+          <div class="item-info">
+            <strong>Photo Booth Strips</strong>
+            3-shot vertical strips · 6×18cm<br>
+            Sky version + Pink version<br>
+            Matte finish · Full bleed print
+          </div>
+        </div>
+      </div>
+
+      <!-- PHOTO CARDS -->
+      <div class="item-section">
+        <div class="item-section-title">
+          Photo Cards (Polaroid Style)
+          <span class="qty-badge" style="background:#e86b8a;color:white;">×4</span>
+        </div>
+        <div class="item-row">
+          <div class="photo-card" style="--rot:-2deg;">
+            <div class="pc-img">
+              <svg viewBox="0 0 76 114" width="76" height="114">
+                <rect width="76" height="114" fill="#c8e0f0"/>
+                <ellipse cx="38" cy="38" rx="20" ry="24" fill="#e8d0b8"/>
+                <rect x="0" y="70" width="76" height="44" fill="#7ab8d4"/>
+                <text x="18" y="100" font-size="22" fill="rgba(255,255,255,0.3)" font-family="'Abril Fatface',serif">♪</text>
+                <text x="20" y="20" font-size="14" fill="#7ab8d4" font-family="serif">☁</text>
+              </svg>
+            </div>
+            <div class="pc-caption">Sky Blue ver.</div>
+          </div>
+
+          <div class="photo-card" style="--rot:1.5deg;">
+            <div class="pc-img">
+              <svg viewBox="0 0 76 114" width="76" height="114">
+                <rect width="76" height="114" fill="#f5e8d0"/>
+                <ellipse cx="38" cy="38" rx="20" ry="24" fill="#e8d0b8"/>
+                <rect x="0" y="70" width="76" height="44" fill="#e86b8a"/>
+                <text x="16" y="100" font-size="22" fill="rgba(255,255,255,0.3)" font-family="serif">♥</text>
+                <text x="20" y="20" font-size="12" fill="#e86b8a" font-family="serif">★</text>
+              </svg>
+            </div>
+            <div class="pc-caption">Pink ver.</div>
+          </div>
+
+          <div class="photo-card" style="--rot:-3deg;">
+            <div class="pc-img">
+              <svg viewBox="0 0 76 114" width="76" height="114">
+                <rect width="76" height="114" fill="#1a1510"/>
+                <ellipse cx="38" cy="38" rx="20" ry="24" fill="#d8c8a8"/>
+                <rect x="0" y="70" width="76" height="44" fill="#2a2018"/>
+                <text x="14" y="100" font-size="22" fill="rgba(232,200,48,0.25)" font-family="'Abril Fatface',serif">SKY</text>
+                <text x="22" y="22" font-size="11" fill="#e8c830" font-family="'Caveat',cursive">2026</text>
+              </svg>
+            </div>
+            <div class="pc-caption">Night ver.</div>
+          </div>
+
+          <div class="photo-card" style="--rot:2deg;">
+            <div class="pc-img">
+              <svg viewBox="0 0 76 114" width="76" height="114">
+                <rect width="76" height="114" fill="#7aab6a"/>
+                <ellipse cx="38" cy="38" rx="20" ry="24" fill="#e8d0b8"/>
+                <rect x="0" y="70" width="76" height="44" fill="#5a8a4a"/>
+                <text x="16" y="100" font-size="22" fill="rgba(255,255,255,0.25)" font-family="serif">✿</text>
+                <text x="14" y="22" font-size="12" fill="#e8c830" font-family="sans-serif">★</text>
+              </svg>
+            </div>
+            <div class="pc-caption">Garden ver.</div>
+          </div>
+
+          <div class="item-info">
+            <strong>4 Photo Cards</strong>
+            Polaroid format · 8.5×5.4cm<br>
+            Sky Blue · Pink · Night · Garden<br>
+            Glossy finish · White border
+          </div>
+        </div>
+      </div>
+
+      <!-- STICKER SHEET + BOOKLET -->
+      <div class="item-section">
+        <div class="item-section-title">
+          Sticker Sheet + Mini Booklet
+          <span class="qty-badge" style="background:#7aab6a;color:white;">×2</span>
+        </div>
+        <div class="item-row">
+          <div class="sticker-sheet">
+            <div class="ss-title">✦ Piano in the Sky Stickers ✦</div>
+            <div class="ss-grid">
+              <div class="sticker" style="background:#e86b8a20;">♥</div>
+              <div class="sticker" style="background:#7ab8d420;">☁</div>
+              <div class="sticker" style="background:#e8c83020;">★</div>
+              <div class="sticker" style="background:#7aab6a20;">✿</div>
+              <div class="sticker" style="background:#e8783020;">♪</div>
+              <div class="sticker" style="background:#b48abf20;">✦</div>
+              <div class="sticker" style="background:#e86b8a20;">?</div>
+              <div class="sticker" style="background:#7ab8d420;">♩</div>
+              <div class="sticker" style="background:#e8c83020;">☆</div>
+            </div>
+            <div style="font-family:'Caveat',cursive;font-size:8px;color:#aaa;text-align:center;margin-top:8px;border-top:1px dashed #ddd;padding-top:6px;">cut along dashed lines</div>
+          </div>
+
+          <div class="mini-booklet">
+            <div class="mb-cover">
+              <div style="position:absolute;inset:0;background:rgba(0,0,0,0.15);"></div>
+              <svg style="position:absolute;bottom:0;right:0;opacity:0.2;" viewBox="0 0 60 40" width="60" height="40">
+                <rect x="4" y="8" width="52" height="28" rx="3" fill="none" stroke="white" stroke-width="2"/>
+                <rect x="10" y="14" width="5" height="16" rx="1" fill="none" stroke="white" stroke-width="1.5"/>
+                <rect x="17" y="14" width="5" height="16" rx="1" fill="none" stroke="white" stroke-width="1.5"/>
+                <rect x="24" y="14" width="5" height="16" rx="1" fill="none" stroke="white" stroke-width="1.5"/>
+                <rect x="13" y="14" width="3" height="10" rx="1" fill="white"/>
+                <rect x="27" y="14" width="3" height="10" rx="1" fill="white"/>
+              </svg>
+              <div class="mb-cover-title">Piano<br>in the Sky</div>
+              <div class="mb-cover-sub">mini booklet · 2026</div>
+            </div>
+            <div class="mb-body">
+              <span class="mb-line">Lyrics & Notes</span>
+              <span class="mb-line">Concept Photos</span>
+              <span class="mb-line">Fan Message</span>
+              <span class="mb-line">QR → Booth Frame</span>
+            </div>
+          </div>
+
+          <div class="mystery-card">
+            <div class="mc-q">?</div>
+            <div class="mc-label">Mystery Card</div>
+            <div class="mc-sub">1 random hidden<br>variant per box</div>
+          </div>
+
+          <div class="item-info">
+            <strong>Sticker Sheet</strong>
+            A6 size · 9 die-cut stickers<br>
+            <strong style="margin-top:4px;">Mini Booklet</strong>
+            20 pages · lyrics + photos<br>
+            <strong style="margin-top:4px;">Mystery Card</strong>
+            Random 1 of 6 hidden variants
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end contents column -->
+  </div>
+</div><!-- end view-box -->
+
+
+<!-- ════ VIEW 2: PHOTO BOOTH STRIP ════ -->
+<div id="view-booth" class="view">
+  <div class="booth-layout">
+
+    <!-- full booth strip -->
+    <div>
+      <div style="font-family:'Unbounded',sans-serif;font-size:9px;letter-spacing:0.2em;color:var(--brown);text-transform:uppercase;margin-bottom:14px;opacity:0.7;">Photo Booth Strip · Full Size</div>
+      <div class="booth-strip-full">
+        <div class="bsf-topbar">
+          <span class="bsf-tb-title">Piano in the Sky</span>
+          <span class="bsf-tb-date">2026</span>
+        </div>
+
+        <!-- shot 1 -->
+        <div class="booth-shot">
+          <svg viewBox="0 0 180 135" width="180" height="135">
+            <rect width="180" height="135" fill="#c8e0f0"/>
+            <ellipse cx="90" cy="58" rx="36" ry="42" fill="#e8d0b8"/>
+            <rect x="0" y="95" width="180" height="40" fill="#7ab8d4"/>
+            <text x="18" y="30" font-size="24" fill="rgba(122,184,212,0.4)" font-family="serif">☁</text>
+            <text x="140" y="45" font-size="18" fill="rgba(122,184,212,0.35)" font-family="serif">☁</text>
+            <!-- hands making frame gesture -->
+            <text x="54" y="78" font-size="28" fill="rgba(0,0,0,0.15)" font-family="sans-serif">🤏</text>
+            <text x="98" y="78" font-size="28" fill="rgba(0,0,0,0.15)" font-family="sans-serif">🤏</text>
+            <!-- doodle text -->
+            <text x="108" y="28" font-size="9" fill="#e86b8a" font-family="'Caveat',cursive" font-weight="bold" transform="rotate(-10,120,25)">silau gess~</text>
+            <!-- stars -->
+            <text x="10" y="90" font-size="12" fill="#e8c830" font-family="sans-serif">✦</text>
+            <text x="160" y="80" font-size="10" fill="#e8c830" font-family="sans-serif">✦</text>
+          </svg>
+        </div>
+        <div style="height:4px;background:#eee;"></div>
+
+        <!-- shot 2 — sky title card -->
+        <div class="booth-shot">
+          <svg viewBox="0 0 180 135" width="180" height="135">
+            <rect width="180" height="135" fill="#7ab8d4"/>
+            <!-- wavy background -->
+            <path d="M0 80 Q45 60 90 80 Q135 100 180 80 L180 135 L0 135 Z" fill="rgba(255,255,255,0.15)"/>
+            <!-- big SKY text -->
+            <text x="20" y="100" font-family="'Abril Fatface',serif" font-size="72" fill="white" opacity="0.9">Sky</text>
+            <!-- mandatory text doodle -->
+            <text x="10" y="30" font-size="10" fill="white" font-family="'Caveat',cursive" font-weight="bold" transform="rotate(-5,50,28)">mandatory~</text>
+            <!-- hands -->
+            <text x="110" y="75" font-size="32" fill="rgba(255,255,255,0.3)" font-family="sans-serif">🤌</text>
+            <!-- small hearts -->
+            <text x="148" y="30" font-size="12" fill="rgba(255,255,255,0.6)" font-family="serif">♥</text>
+            <text x="20" y="110" font-size="10" fill="rgba(255,255,255,0.4)" font-family="sans-serif">★</text>
+          </svg>
+        </div>
+        <div style="height:4px;background:#eee;"></div>
+
+        <!-- shot 3 -->
+        <div class="booth-shot">
+          <svg viewBox="0 0 180 135" width="180" height="135">
+            <rect width="180" height="135" fill="#f0d8e8"/>
+            <ellipse cx="90" cy="58" rx="36" ry="42" fill="#e8d0b8"/>
+            <rect x="0" y="95" width="180" height="40" fill="#e86b8a"/>
+            <!-- speech bubbles doodle -->
+            <rect x="10" y="80" width="55" height="22" rx="10" fill="rgba(122,184,212,0.6)"/>
+            <text x="14" y="96" font-size="9" fill="#1a1510" font-family="'Caveat',cursive" font-weight="bold">hadep kamera</text>
+            <rect x="110" y="72" width="48" height="22" rx="10" fill="rgba(232,200,48,0.7)"/>
+            <text x="114" y="88" font-size="9" fill="#1a1510" font-family="'Caveat',cursive" font-weight="bold">gasukan!</text>
+            <text x="15" y="120" font-size="10" fill="rgba(255,255,255,0.6)" font-family="sans-serif">♥ ♥ ♥</text>
+          </svg>
+        </div>
+
+        <div class="bsf-bottom">
+          <span class="bsf-brand">Piano in the Sky</span>
+          <span class="bsf-date-text">a.l. · 2026 · Floating Keys Records</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- booth info -->
+    <div class="booth-info-col">
+      <div>
+        <div class="booth-info-title">Photo Booth<br>Experience</div>
+        <div class="booth-info-sub">Polaroid station — mimic the artist's poses</div>
+      </div>
+
+      <!-- pose guide cards -->
+      <div>
+        <div style="font-family:'Unbounded',sans-serif;font-size:9px;letter-spacing:0.15em;color:var(--brown);text-transform:uppercase;margin-bottom:12px;opacity:0.7;">Pose Guide — 3 shots</div>
+        <div class="pose-cards">
+          <div class="pose-card">
+            <div class="pose-num">1</div>
+            <div class="pose-title">Frame Shot</div>
+            <div class="pose-desc">Make a frame with your hands like you're holding the sky. Look up slightly.</div>
+          </div>
+          <div class="pose-card pink-top">
+            <div class="pose-num">2</div>
+            <div class="pose-title">Sky Card</div>
+            <div class="pose-desc">Hold the "SKY" card in front of you. This slot is the title card — mandatory ✦</div>
+          </div>
+          <div class="pose-card yellow-top">
+            <div class="pose-num">3</div>
+            <div class="pose-title">Free Pose</div>
+            <div class="pose-desc">Your choice! Point up, wave, do a heart — the booth is yours for 10 seconds.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- event details -->
+      <div class="event-details">
+        <div class="ed-title">Event Details</div>
+        <div class="ed-row">
+          <span class="ed-label">Format</span>
+          <span class="ed-val">Photo Booth Style Pop-up</span>
+        </div>
+        <div class="ed-row">
+          <span class="ed-label">Strip size</span>
+          <span class="ed-val">6cm × 18cm · 3-shot vertical</span>
+        </div>
+        <div class="ed-row">
+          <span class="ed-label">Finish</span>
+          <span class="ed-val">Matte laminate + doodle overlay</span>
+        </div>
+        <div class="ed-row">
+          <span class="ed-label">QR Code</span>
+          <span class="ed-val">Digital frame download</span>
+        </div>
+        <div class="ed-row">
+          <span class="ed-label">Prop kit</span>
+          <span class="ed-val">SKY card · Piano keys · Stars</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ════ VIEW 3: ALL PHOTO CARDS ════ -->
+<div id="view-cards" class="view">
+  <div class="cards-spread">
+    <div class="cards-spread-title">All Photo Cards</div>
+    <div class="cards-spread-sub">4 standard cards + 1 mystery variant per box · hover to lift</div>
+
+    <div class="card-set">
+
+      <!-- ROW 1: standard 4 -->
+      <div class="card-set-row">
+        <div class="csr-label">Standard Versions — included in every box</div>
+        <div class="cards-fan">
+
+          <!-- Sky Blue ver -->
+          <div class="pc-design" style="transform:rotate(-3deg);">
+            <div class="tape-h" style="background:rgba(122,184,212,0.6);width:36px;top:-6px;left:20px;transform:rotate(5deg);"></div>
+            <div class="pc-img-area">
+              <svg viewBox="0 0 86 129" width="86" height="129">
+                <rect width="86" height="129" fill="#c8e0f0"/>
+                <rect x="0" y="0" width="86" height="8" fill="#7ab8d4"/>
+                <ellipse cx="43" cy="46" rx="22" ry="26" fill="#e8d0b8"/>
+                <rect x="0" y="78" width="86" height="51" fill="#7ab8d4"/>
+                <!-- clouds -->
+                <ellipse cx="18" cy="30" rx="12" ry="6" fill="rgba(255,255,255,0.5)"/>
+                <ellipse cx="70" cy="22" rx="10" ry="5" fill="rgba(255,255,255,0.45)"/>
+                <!-- music note -->
+                <text x="12" y="112" font-size="18" fill="rgba(255,255,255,0.25)" font-family="serif">♪</text>
+                <!-- doodle stars -->
+                <text x="60" y="100" font-size="10" fill="rgba(255,255,255,0.4)" font-family="sans-serif">✦</text>
+                <text x="14" y="100" font-size="8" fill="rgba(255,255,255,0.4)" font-family="sans-serif">✦</text>
+                <!-- tape strip at bottom of image area -->
+                <rect x="28" y="120" width="30" height="6" rx="2" fill="rgba(232,200,48,0.5)"/>
+              </svg>
+            </div>
+            <div class="pc-name">Sky Blue ver.</div>
+            <div class="stamp" style="bottom:12px;right:4px;border-color:#7ab8d4;color:#7ab8d4;font-size:6px;width:24px;height:24px;">A.L.<br>2026</div>
+          </div>
+
+          <!-- Pink ver -->
+          <div class="pc-design" style="transform:rotate(1.5deg);">
+            <div class="tape-h" style="background:rgba(232,107,138,0.6);width:30px;top:-6px;left:30px;transform:rotate(-3deg);"></div>
+            <div class="pc-img-area">
+              <svg viewBox="0 0 86 129" width="86" height="129">
+                <rect width="86" height="129" fill="#f5e0e8"/>
+                <rect x="0" y="0" width="86" height="8" fill="#e86b8a"/>
+                <ellipse cx="43" cy="46" rx="22" ry="26" fill="#e8d0b8"/>
+                <rect x="0" y="78" width="86" height="51" fill="#e86b8a"/>
+                <!-- hearts scattered -->
+                <text x="10" y="28" font-size="12" fill="rgba(232,107,138,0.4)" font-family="serif">♥</text>
+                <text x="64" y="35" font-size="10" fill="rgba(232,107,138,0.4)" font-family="serif">♥</text>
+                <text x="12" y="108" font-size="16" fill="rgba(255,255,255,0.25)" font-family="serif">♥</text>
+                <text x="52" y="118" font-size="10" fill="rgba(255,255,255,0.3)" font-family="serif">♥</text>
+                <rect x="22" y="120" width="42" height="6" rx="2" fill="rgba(255,255,255,0.25)"/>
+              </svg>
+            </div>
+            <div class="pc-name">Pink ver.</div>
+            <div class="stamp" style="bottom:12px;right:4px;border-color:#e86b8a;color:#e86b8a;font-size:6px;width:24px;height:24px;">A.L.<br>2026</div>
+          </div>
+
+          <!-- Night ver -->
+          <div class="pc-design" style="transform:rotate(-2deg);">
+            <div class="tape-h" style="background:rgba(232,200,48,0.7);width:40px;top:-6px;left:18px;transform:rotate(2deg);"></div>
+            <div class="pc-img-area">
+              <svg viewBox="0 0 86 129" width="86" height="129">
+                <rect width="86" height="129" fill="#1a1510"/>
+                <rect x="0" y="0" width="86" height="8" fill="#e8c830"/>
+                <ellipse cx="43" cy="46" rx="22" ry="26" fill="#d8c8a8"/>
+                <rect x="0" y="78" width="86" height="51" fill="#2a2018"/>
+                <!-- stars night sky -->
+                <text x="8" y="24" font-size="6" fill="rgba(232,200,48,0.6)" font-family="sans-serif">✦</text>
+                <text x="65" y="18" font-size="8" fill="rgba(232,200,48,0.5)" font-family="sans-serif">✦</text>
+                <text x="72" y="60" font-size="5" fill="rgba(232,200,48,0.4)" font-family="sans-serif">✦</text>
+                <text x="6" y="65" font-size="5" fill="rgba(232,200,48,0.4)" font-family="sans-serif">✦</text>
+                <!-- piano key accent -->
+                <text x="8" y="115" font-size="16" fill="rgba(232,200,48,0.2)" font-family="'Abril Fatface',serif">SKY</text>
+                <rect x="8" y="120" width="6" height="5" rx="0" fill="rgba(232,200,48,0.3)"/>
+                <rect x="16" y="120" width="6" height="5" rx="0" fill="rgba(232,200,48,0.3)"/>
+                <rect x="24" y="120" width="6" height="5" rx="0" fill="rgba(232,200,48,0.3)"/>
+              </svg>
+            </div>
+            <div class="pc-name">Night ver.</div>
+            <div class="stamp" style="bottom:12px;right:4px;border-color:#e8c830;color:#e8c830;font-size:6px;width:24px;height:24px;">A.L.<br>2026</div>
+          </div>
+
+          <!-- Garden ver -->
+          <div class="pc-design" style="transform:rotate(2.5deg);">
+            <div class="tape-h" style="background:rgba(122,171,106,0.6);width:34px;top:-6px;left:24px;transform:rotate(-4deg);"></div>
+            <div class="pc-img-area">
+              <svg viewBox="0 0 86 129" width="86" height="129">
+                <rect width="86" height="129" fill="#e8f0e0"/>
+                <rect x="0" y="0" width="86" height="8" fill="#7aab6a"/>
+                <ellipse cx="43" cy="46" rx="22" ry="26" fill="#e8d0b8"/>
+                <rect x="0" y="78" width="86" height="51" fill="#7aab6a"/>
+                <!-- flowers -->
+                <text x="8" y="30" font-size="12" fill="rgba(122,171,106,0.5)" font-family="serif">✿</text>
+                <text x="64" y="28" font-size="10" fill="rgba(122,171,106,0.4)" font-family="serif">✿</text>
+                <text x="10" y="110" font-size="16" fill="rgba(255,255,255,0.25)" font-family="serif">✿</text>
+                <text x="55" y="118" font-size="10" fill="rgba(255,255,255,0.3)" font-family="serif">✿</text>
+                <text x="35" y="105" font-size="8" fill="rgba(255,255,255,0.3)" font-family="sans-serif">★</text>
+              </svg>
+            </div>
+            <div class="pc-name">Garden ver.</div>
+            <div class="stamp" style="bottom:12px;right:4px;border-color:#7aab6a;color:#7aab6a;font-size:6px;width:24px;height:24px;">A.L.<br>2026</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ROW 2: mystery variants -->
+      <div class="card-set-row">
+        <div class="csr-label">Mystery Variants — 1 random per box (6 total)</div>
+        <div class="cards-fan">
+
+          <!-- mystery 1 -->
+          <div class="pc-design" style="transform:rotate(-4deg);filter:brightness(0.95);">
+            <div class="pc-img-area">
+              <svg viewBox="0 0 86 129" width="86" height="129">
+                <rect width="86" height="129" fill="#f5c8d8"/>
+                <rect x="0" y="0" width="86" height="8" fill="#d8608a"/>
+                <ellipse cx="43" cy="46" rx="22" ry="26" fill="#e8d0b8"/>
+                <rect x="0" y="78" width="86" height="51" fill="#d8608a"/>
+                <text x="28" y="38" font-size="22" fill="rgba(255,255,255,0.4)" font-family="serif">♡</text>
+                <text x="8" y="105" font-size="14" fill="rgba(255,255,255,0.3)" font-family="sans-serif">✦</text>
+                <text x="55" y="115" font-size="9" fill="rgba(255,255,255,0.3)" font-family="sans-serif">✦</text>
+              </svg>
+            </div>
+            <div class="pc-name">Secret: Blush</div>
+          </div>
+
+          <!-- mystery 2 -->
+          <div class="pc-design" style="transform:rotate(3deg);">
+            <div class="pc-img-area">
+              <svg viewBox="0 0 86 129" width="86" height="129">
+                <rect width="86" height="129" fill="#e8e0f0"/>
+                <rect x="0" y="0" width="86" height="8" fill="#9070b8"/>
+                <ellipse cx="43" cy="46" rx="22" ry="26" fill="#e8d0b8"/>
+                <rect x="0" y="78" width="86" height="51" fill="#9070b8"/>
+                <text x="12" y="30" font-size="14" fill="rgba(144,112,184,0.4)" font-family="sans-serif">✦</text>
+                <text x="62" y="22" font-size="10" fill="rgba(144,112,184,0.4)" font-family="sans-serif">✦</text>
+                <text x="18" y="108" font-size="16" fill="rgba(255,255,255,0.2)" font-family="'Abril Fatface',serif">♪</text>
+              </svg>
+            </div>
+            <div class="pc-name">Secret: Lilac</div>
+          </div>
+
+          <!-- mystery 3 -->
+          <div class="pc-design" style="transform:rotate(-1deg);">
+            <div class="pc-img-area">
+              <svg viewBox="0 0 86 129" width="86" height="129">
+                <rect width="86" height="129" fill="#f8f0e0"/>
+                <rect x="0" y="0" width="86" height="8" fill="#e07840"/>
+                <ellipse cx="43" cy="46" rx="22" ry="26" fill="#e8d0b8"/>
+                <rect x="0" y="78" width="86" height="51" fill="#e07840"/>
+                <text x="10" y="28" font-size="12" fill="rgba(224,120,64,0.4)" font-family="sans-serif">★</text>
+                <text x="65" y="35" font-size="10" fill="rgba(224,120,64,0.4)" font-family="sans-serif">★</text>
+                <text x="22" y="110" font-size="14" fill="rgba(255,255,255,0.25)" font-family="serif">✦</text>
+              </svg>
+            </div>
+            <div class="pc-name">Secret: Sunset</div>
+          </div>
+
+          <!-- unknown mystery cards -->
+          <div class="mystery-card" style="width:100px;min-height:150px;padding:20px 10px;margin-left:8px;">
+            <div class="mc-q" style="font-size:60px;">?</div>
+            <div class="mc-label">+3 more</div>
+            <div class="mc-sub" style="margin-top:6px;line-height:1.6;">hidden variants<br>collect them all</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- info strip at bottom -->
+      <div style="background:#1a1510;padding:16px 20px;display:flex;gap:32px;flex-wrap:wrap;align-items:center;">
+        <div>
+          <div style="font-family:'Caveat',cursive;font-size:11px;color:rgba(255,255,255,0.35);letter-spacing:0.15em;text-transform:uppercase;">Card Size</div>
+          <div style="font-family:'Caveat',cursive;font-size:15px;font-weight:700;color:white;margin-top:2px;">8.5cm × 5.4cm · Polaroid format</div>
+        </div>
+        <div>
+          <div style="font-family:'Caveat',cursive;font-size:11px;color:rgba(255,255,255,0.35);letter-spacing:0.15em;text-transform:uppercase;">Finish</div>
+          <div style="font-family:'Caveat',cursive;font-size:15px;font-weight:700;color:white;margin-top:2px;">Glossy front · Matte back</div>
+        </div>
+        <div>
+          <div style="font-family:'Caveat',cursive;font-size:11px;color:rgba(255,255,255,0.35);letter-spacing:0.15em;text-transform:uppercase;">Collect</div>
+          <div style="font-family:'Caveat',cursive;font-size:15px;font-weight:700;color:var(--yellow);margin-top:2px;">4 Standard + 1 of 6 Mystery</div>
+        </div>
+        <div>
+          <div style="font-family:'Caveat',cursive;font-size:11px;color:rgba(255,255,255,0.35);letter-spacing:0.15em;text-transform:uppercase;">Label</div>
+          <div style="font-family:'Caveat',cursive;font-size:15px;font-weight:700;color:white;margin-top:2px;">Floating Keys Records · 2026</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+function sv(id, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.tvbtn').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>
